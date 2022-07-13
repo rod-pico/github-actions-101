@@ -1,0 +1,30 @@
+name: Schedule workflow
+
+on:
+  workflow_dispatch:
+
+  schedule:
+    - cron: "0 10 * * 1,3"
+    - cron: "0 10 * * 2"
+
+jobs:
+  job-1:
+    name: Schedule job
+
+    strategy:
+      max-parallel: 3
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        num: [1, 2, 3]
+      
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Skip Tuesday
+        if: github.event.schedule != "0 10 * * 2"
+        run: echo "This step will be skipped on Tuesday"
+
+      - name: Every time
+        run: echo "This step will always run"
+
+      - run: echo "Job number is ${{ matrix.num }} and OS is ${{ matrix.os }}"

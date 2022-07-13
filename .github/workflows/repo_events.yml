@@ -1,0 +1,61 @@
+name: Repo events workflow
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+
+env:
+  WORKFLOW_ENV: workflow_var
+
+defaults:
+  run:
+    shell: bash
+    working-directory: /tmp
+
+jobs:
+  job-1:
+    runs-on: ubuntu-latest
+    
+    env:
+      JOB_ENV: job_var
+
+    defaults:
+      run:
+        working-directory: /bin
+    
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.8.x
+
+      - name: Run a one-line script
+        env:
+          STEP_ENV: step_var
+        run: echo "Step env variable is $STEP_ENV"
+
+      - name: Run a multi-line script
+        run: |
+          echo "Job env variable is ${{ env.JOB_ENV }}"
+          echo "Workflow env variable is ${{ env.WORKFLOW_ENV }}"
+          echo "PWD is $(pwd)"
+
+  job-2:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - run: echo "PWD is $(pwd)"
+  

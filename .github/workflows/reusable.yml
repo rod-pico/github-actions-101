@@ -1,0 +1,37 @@
+name: Reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      username:
+        description: "A username passed from the caller workflow"
+        default: default_username
+        required: false
+        type: string
+    
+    secrets:
+      password:
+        description: "A password passed from the caller workflow"
+        required: false
+    
+    outputs:
+      workflow-output:
+        description: "Workflow output"
+        value: ${{ jobs.print-values.outputs.job-output }}
+
+jobs:
+  print-values:
+    runs-on: ubuntu-latest
+    
+    outputs:
+      job-output: ${{ steps.output-step.outputs.output-value }}
+    
+    steps:
+      - name: Print the values to STDOUT
+        run: |
+          echo "The username is ${{ inputs.username }}"
+          echo "The password is ${{ secrets.password }}"
+      
+      - name: Generate output value
+        id: output-step
+        run: echo "::set-output name=output-value::output_value"

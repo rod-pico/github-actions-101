@@ -1,0 +1,35 @@
+name: Workflow events workflow
+
+on:
+  workflow_run:
+    workflows: ["Manual workflow"]
+    branches: [main]
+
+jobs:
+  job-1:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - run: |
+          echo "Run Workflow events workflow"
+          echo "Upload data" > shared-info.txt
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: shared-package
+          path: ./shared-info.txt
+
+  job-2:
+    needs: [job-1]
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: shared-package
+          path: ./
+
+      - run: cat shared-info.txt

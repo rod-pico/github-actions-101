@@ -1,0 +1,49 @@
+name: Manual workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      log-level:
+        description: "Log level"
+        required: true
+        default: warning
+        type: choice
+        options:
+        - info
+        - warning
+        - debug 
+      
+      print-tags:
+        description: "True to print to STDOUT"
+        required: true 
+        type: boolean 
+      
+      tags:
+        required: true 
+        type: string
+
+jobs:
+  call-workflow:
+    uses: ./.github/workflows/reusable.yml
+    with:
+      username: personal_name
+    secrets:  # Only valid in reusable workflows
+      password: ${{ secrets.PASSWORD }}
+
+  print-workflow-output:
+    if: ${{ always() }}
+    needs: call-workflow
+
+    runs-on: ubuntu-latest
+    
+    steps:
+      - run: echo "Workflow output called is ${{ needs.call-workflow.outputs.workflow-output }}"
+
+  print-inputs:
+    if: ${{ inputs.print-tags }}
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Print the input tag to STDOUT
+        run: echo "The log level is ${{ inputs.log-level }} and tags are ${{ inputs.tags }}"

@@ -3,6 +3,7 @@ name: Workflow events workflow
 on:
   workflow_run:
     workflows: ["Manual workflow"]
+    types: [completed]
     branches: [main]
 
 jobs:
